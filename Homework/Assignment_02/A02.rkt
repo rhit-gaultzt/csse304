@@ -2,9 +2,13 @@
 
 (provide sum-of-squares range my-set? union more-positives? add-quotes get-304-quine)
 
+;; (sum-of-squares a) - Returns the sum of squares of the list of numbers a
 (define sum-of-squares
   (lambda (a)
-    (nyi)))
+    (if (null? a)
+        0
+        (+ (* (car a) (car a))
+           (sum-of-squares (cdr a))))))
 
 (define range
   (lambda (a b)

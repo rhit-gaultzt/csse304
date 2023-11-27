@@ -2,68 +2,68 @@
 
 (provide interval-contains? interval-intersects? interval-union make-vec-from-points dot-product vector-magnitude distance)
 
-;; (interval-contain?s a b) - Returns a boolean value that indicates
-;; whether the integer b is in the closed interval a.
+;; (interval-contain?s interval number) - Returns a boolean value that indicates
+;; whether number is in the closed interval a.
 (define interval-contains?
-  (lambda (a b)
-    (and (<= (car a) b)
-         (>= (cadr a) b))))
+  (lambda (interval number)
+    (and (<= (car interval) number)
+         (>= (cadr interval) number))))
 
-;; (interval-intersects? a b) - Returns a boolean value that indicates
-;; whether the closed intervals a and b have a nonempty intersection.
+;; (interval-intersects? i1 i2) - Returns a boolean value that indicates whether
+;; the closed intervals i1 and i2 have a nonempty intersection.
 (define interval-intersects?
-  (lambda (a b)
-    (or (interval-contains? a (car b))
-        (interval-contains? a (cadr b))
-        (interval-contains? b (car a))
-        (interval-contains? b (cadr a)))))
+  (lambda (i1 i2)
+    (or (interval-contains? i1 (car i2))
+        (interval-contains? i1 (cadr i2))
+        (interval-contains? i2 (car i1))
+        (interval-contains? i2 (cadr i1)))))
 
-;; (interval-union a b) - Returns the union of closed intervals a and b.
+;; (interval-union i1 i2) - Returns the union of closed intervals i1 and i2.
 (define interval-union
-  (lambda (a b)
-    (if (interval-intersects? a b)
-        (list (list (min (car a) (car b))
-                    (max (cadr a) (cadr b))))
-        (list a b))))
+  (lambda (i1 i2)
+    (if (interval-intersects? i1 i2)
+        (list (list (min (car i1) (car i2))
+                    (max (cadr i1) (cadr i2))))
+        (list i1 i2))))
 
-;; (make-vec-from-points a b) - Returns a vector that goes from point a
-;; to point b. Assumes a and b have equal length.
+;; (make-vec-from-points p1 p2) - Returns a vector that goes from point p1 to
+;; point p2. Assumes p1 and p2 have equal length.
 (define make-vec-from-points
-  (lambda (a b)
-    (if (null? a)
+  (lambda (p1 p2)
+    (if (null? p1)
         '()
-        (cons (- (car b) (car a))
-              (make-vec-from-points (cdr a) (cdr b))))))
+        (cons (- (car p2) (car p1))
+              (make-vec-from-points (cdr p1) (cdr p2))))))
 
-;; (dot-product a b) - Returns the dot product of vectors a and b. Assumes
-;; a and b have equal length.
+;; (dot-product v1 v2) - Returns the dot product of vectors v1 and v2. Assumes
+;; v1 and v2 have equal length.
 (define dot-product
-  (lambda (a b)
-    (if (null? a)
+  (lambda (v1 v2)
+    (if (null? v1)
         0
-        (+ (* (car a) (car b))
-           (dot-product (cdr a) (cdr b))))))
+        (+ (* (car v1) (car v2))
+           (dot-product (cdr v1) (cdr v2))))))
 
-;; (vector-magnitude a) - Returns the magnitude of the vector a. Assumes the
+;; (vector-magnitude v) - Returns the magnitude of the vector v. Assumes the
 ;; magnitude of the vector is an integer.
 (define vector-magnitude
-  (lambda (a)
-    (sqrt (vector-sum-squares a))))
+  (lambda (v)
+    (sqrt (vector-sum-squares v))))
 
-;; (vector-sum-squares a) - Returns the sum of squares of the vector a. Helper
+;; (vector-sum-squares v) - Returns the sum of squares of the vector v. Helper
 ;; procedure for vector-magnitude.
 (define vector-sum-squares
-  (lambda (a)
-    (if (null? a)
+  (lambda (v)
+    (if (null? v)
         0
-        (+ (* (car a) (car a))
-           (vector-sum-squares (cdr a))))))
+        (+ (* (car v) (car v))
+           (vector-sum-squares (cdr v))))))
 
-;; (distance a b) - Returns the distance between points a and b. Assumes the
+;; (distance p1 p2) - Returns the distance between points p1 and p2. Assumes the
 ;; distance is an integer.
 (define distance
-  (lambda (a b)
-    (vector-magnitude (make-vec-from-points a b))))
+  (lambda (p1 p2)
+    (vector-magnitude (make-vec-from-points p1 p2))))
 
 ;;--------  Used by the testing mechanism   ------------------
 
