@@ -6,17 +6,17 @@
 ;; whether number is in the closed interval a.
 (define interval-contains?
   (lambda (interval number)
-    (and (<= (car interval) number)
-         (>= (cadr interval) number))))
+    (and [<= (car interval) number]
+         [>= (cadr interval) number])))
 
 ;; (interval-intersects? i1 i2) - Returns a boolean value that indicates whether
 ;; the closed intervals i1 and i2 have a nonempty intersection.
 (define interval-intersects?
   (lambda (i1 i2)
-    (or (interval-contains? i1 (car i2))
-        (interval-contains? i1 (cadr i2))
-        (interval-contains? i2 (car i1))
-        (interval-contains? i2 (cadr i1)))))
+    (or [interval-contains? i1 (car i2)]
+        [interval-contains? i1 (cadr i2)]
+        [interval-contains? i2 (car i1)]
+        [interval-contains? i2 (cadr i1)])))
 
 ;; (interval-union i1 i2) - Returns the union of closed intervals i1 and i2.
 (define interval-union
