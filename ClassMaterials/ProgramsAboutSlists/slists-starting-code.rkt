@@ -10,8 +10,15 @@
 ;-------------------------------------------------------------
 ; Does slist contain sym (at any level)?
 (define (contains? slist sym)
-  (let recurse ([slist slist]) ; We'll use named-let a lot today
-    (cond [(null? slist) 'nyi])))
+  (cond
+    [(null? slist) #f]
+    [(symbol? (car slist))
+     (or (eqv? (car slist) sym)
+         (contains? (cdr slist) sym))]
+    [else
+     (or (contains? (car slist) sym)
+         (contains? (cdr slist) sym))]))
+        
 
 ; I'll do this one with you.  Then go on and do either count
 ; occurances or flatten yourself
@@ -28,7 +35,14 @@
 ; how many times does sym occur in slist?
 (define  (count-occurrences slist sym)
   (let count ([slist slist])
-    (cond [(null? slist) 'nyi])))
+    (cond [(null? slist) 0]
+          [(symbol? (car slist))
+           (if (eqv? sym (car slist))
+               (add1 (count-occurrences (cdr slist) sym))
+               (count-occurrences (cdr slist) sym))]
+          [else
+           (+ (count-occurrences (car slist) sym)
+              (count-occurrences (cdr slist) sym))])))
 	  
 
 
@@ -42,7 +56,13 @@
 ; From the s-list produce a sinlge flat list whose symbols are printed
 ; in the same order as the original s-list
 (define  (flatten slist)
-  (cond [(null? slist) 'nyi]))
+  (cond [(null? slist) '()]
+        [(symbol? (car slist))
+         (cons (car slist)
+               (flatten (cdr slist)))]
+        [else
+         (append (flatten (car slist))
+                 (flatten (cdr slist)))]))
 
 
 
@@ -87,7 +107,17 @@
 ; say replace true with (lambda (a) (lambda (b) a)).
 
 (define (replace-free code var value)
-  'nyi)
+  (cond [(symbol? code)
+         (if (eqv? code var)
+             value
+             code)]
+        [(eqv? (car code) 'lambda)
+         (if (eqv? var (caadr code))
+             code
+             (list 'lambda (second code) (replace-free (third code) var value)))]
+        [else
+         (list (replace-free (first code) var value)
+               (replace-free (second code) var value))]))
 
 ; Some examples of output:
 ; 

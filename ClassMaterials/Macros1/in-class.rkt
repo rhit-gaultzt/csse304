@@ -29,7 +29,11 @@
 
 (define-syntax BW
   (lambda (stx)
-    (datum->syntax stx '(quote nyi))))
+    (datum->syntax stx
+                   (reverse (cdr (syntax->datum stx))))))
+
+(BW 1 2 +)
+(BW 1 2 3 list)
 
 ;; IN CLASS EXAMPLE SWAP
 
@@ -58,10 +62,16 @@
 (define-syntax (classic-if stx)
   (syntax-case stx ()
     [(classic-if test then-exp)
-     #'(quote nyi)]
+     #'(when test then-exp)]
     [(classic-if test then-exp else-exp)
-     #'(quote nyi)]
+     #'(if test
+           then-exp
+           else-exp)]
     ))
+
+(classic-if #t 1)
+(classic-if #f 1)
+(classic-if #f 1 2)
 
 ;; IN CLASS EXAMPLE DUPSYMS
 ;;
@@ -106,7 +116,9 @@
   (syntax-case stx ()
     [(myand exp) #'exp]
     [(myand exp exps ...)
-     #'(quote nyi)]))
+     #'(if exp
+           (myand exps ...)
+           #f)]))
 
 ;; EXERCISE MYLET*
 ;; Build an your own implementation of mylet*.
@@ -115,10 +127,16 @@
 ;; of lambda.
 
 (define-syntax (mylet* stx)
-  #'(quote nyi))
+  (syntax-case stx ()
+    [(mylet* (mapping) bodies ...)
+     #'(let (mapping) bodies ...)]
+    [(mylet* (mapping mappings ...) bodies ...)
+     #'(let (mapping)
+         (mylet* (mappings ...) bodies ...))]))
 
 ;; Usage
 ;; (mylet* ((a 2) (b (+ 1 a))) (+ a b)) yields 5
+(mylet* ((a 2) (b (+ 1 a))) (+ a b))
 
 ;; IN CLASS EXAMPLE REPEAT
 ;; 

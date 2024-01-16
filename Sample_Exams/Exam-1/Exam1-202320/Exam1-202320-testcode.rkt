@@ -7,7 +7,7 @@
 ; If you find errors in your code, fix them, save your file, click the "Run" button again, and type (r)
 ; You can run a specific group of tests using (run-tests group-name)
 
-(require "../testcode-base.rkt")
+(require "testcode-base.rkt")
 (require "Exam1-202320.rkt")
 (provide get-weights get-names individual-test test)
 
@@ -30,10 +30,11 @@
                  [(running-sum '(2 4 8 16)) '(2 6 14 30) 1]
                  )
   (sublists equal-sublists? ; (run-test subsets)
-                 [(sublists '(1)) '(() (1)) 1] ; (run-test subsets 1)
-                 [(sublists '(1 2)) '(() (1) (2) (1 2)) 1]
-                 [(sublists '(1 2 3)) '(() (1) (2) (3) (1 2) (1 3) (2 3) (1 2 3)) 1]
-                 )
+            [(sublists '(1)) '(() (1)) 1] ; (run-test subsets 1)
+            [(sublists '(1 2)) '(() (1) (2) (1 2)) 1]
+            [(sublists '(1 2 3)) '(() (1) (2) (3) (1 2) (1 3) (2 3) (1 2 3)) 1]
+            )
+  
   (queue equal?
          [(let ((q1 (make-queue))) (q1 'empty?)) #t 1]
          [(let ((q1 (make-queue)))
@@ -75,24 +76,24 @@
             [(snl-type '(((1 2) (3)) ((4) (5)) (6))) 'error 1]
             )
   
-      (two-stream equal?
+  (two-stream equal?
             [(let ((s (two-stream))) (list (s) (s) (s) (s))) '(2 4 8 16) 1]
             [(let ((s (two-stream))
                    (s2 (two-stream))) (list (s) (s2) (s2) (s) (s2))) '(2 2 4 4 8) 1]
             )
-      (fib-stream equal?
+  (fib-stream equal?
             [(let ((s (fib-stream))) (list (s) (s) (s) (s) (s))) '(2 3 5 8 13) 1]
             [(let ((s (fib-stream))
                    (s2 (fib-stream))) (list (s) (s2) (s2) (s) (s2))) '(2 2 3 3 5) 1]
             )
 
-      (alternate-stream equal?
+  (alternate-stream equal?
             [(let ((s (alternate-stream (fib-stream) (two-stream)) )) (list (s) (s) (s) (s) (s) (s) )) '(2 2 3 4 5 8) 1]
             [(let ((s (alternate-stream (fib-stream) (alternate-stream (fib-stream) (two-stream)) )))
                (list (s) (s) (s) (s) (s) (s) (s) (s) )) '(2 2 3 2 5 3 8 4) 1]
       )
       
-      (prepend-stream equal?
+  (prepend-stream equal?
             [(let ((s (prepend-stream '(1 1) (fib-stream)) )) (list (s) (s) (s) (s) (s) (s) )) '(1 1 2 3 5 8) 1]
             [(let ((s (prepend-stream '(0 0) (prepend-stream '(1 1) (two-stream)) )))
                (list (s) (s) (s) (s) (s) (s) (s) (s) )) '(0 0 1 1 2 4 8 16) 1]

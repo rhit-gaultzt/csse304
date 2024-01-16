@@ -10,7 +10,12 @@
 
 (define running-sum
   (lambda (ls)
-    (nyi)))
+    (let recur ([ls ls]
+                [sum 0])
+      (if (null? ls)
+          '()
+          (cons (+ (first ls) sum)
+                (recur (cdr ls) (+ (first ls) sum)))))))
 
 ;;  Returns a list of the 2^n sublists of a given list of numbers.  A sublist
 ;;  is a list that contains some elements of the original list - as
@@ -31,7 +36,12 @@
 ;;  Do not use combinations (or similar) in your solution.
 (define sublists
   (lambda (ls)
-    (nyi)))
+    (if (null? ls)
+        '(())
+        (let ((cdr-result (sublists (cdr ls))))
+          (append (map (lambda (x)
+                         (cons (first ls) x)) cdr-result)
+                  cdr-result)))))
 
 ;; You may use mutation to solve this problem
 ;;
@@ -58,7 +68,31 @@
 
 (define make-queue
   (lambda ()
-    (nyi)))
+    (let ([front '()]
+          [back '()])
+      (lambda (command . arg)
+        (case command
+          [(enqueue)
+           (let ([new-back (mcons (first arg)'())])
+             (if (null? front)
+                 (begin
+                   (set! front new-back)
+                   (set! back new-back))
+                 (begin
+                   (set-mcdr! back new-back)
+                   (set! back new-back))))]
+          [(dequeue)
+           (let ([out (mcar front)])
+             (if (null? (mcdr front))
+                 (begin
+                   (set! back '())
+                   (set! front '())
+                   out)
+                 (begin
+                   (set! front (mcdr front))
+                   (out))))]
+          [(empty?) (null? front)]
+          [else 'invalid-command])))))
 
 
 ;; Consider a simple language I call snl (for symbol number list).
@@ -101,7 +135,20 @@
 
 (define snl-type
   (lambda (lst)
-    (nyi)))
+    (cond
+      [(symbol? lst) 'symbol]
+      [(number? lst) 'number]
+      [else
+       (let* ([types (map snl-type lst)]
+              [unequal (filter (lambda (x)
+                                 (not (equal? (first types) x)))
+                               types)])
+              (if (and (null? unequal)
+                       (not (eqv? 'error (first types))))
+                  (list (first types))
+                  'error))])))
+           
+         
 
 ;;  Infinite streams
 ;;  
@@ -150,19 +197,47 @@
 
 (define two-stream
   (lambda ()
-    (nyi)))
+    (let ([cur 1])
+      (lambda ()
+        (set! cur (* 2 cur))
+        cur))))
 
 (define fib-stream
   (lambda ()
-    (nyi)))
+    (let ([first 1]
+          [second 1])
+      (lambda ()
+        (let ([next (+ first second)])
+          (set! first second)
+          (set! second next)
+          next)))))
 
 (define alternate-stream
   (lambda (s1 s2)
-    (nyi)))
+    (let ([s1 s1]
+          [s2 s2]
+          [state 0])
+      (lambda ()
+        (if (eqv? 0 state)
+            (begin
+              (set! state 1)
+              (s1))
+            (begin
+              (set! state 0)
+              (s2)))))))
+              
 
 (define prepend-stream
   (lambda (lst s1)
-    (nyi)))
+    (let ([lst lst]
+          [s1 s1])
+      (lambda ()
+        (if (null? lst)
+            (s1)
+            (let ([out (car lst)])
+              (set! lst (cdr lst))
+              out))))))
+              
 
 
 ;;--------  Used by the testing mechanism   ------------------
