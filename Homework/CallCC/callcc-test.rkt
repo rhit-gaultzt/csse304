@@ -57,35 +57,36 @@
                  [(my-func) 'good 4]
                  [(retfib 5) '(1 1 2 3 5 8) 4]
               )
-                (jobs equal?
-            [(let ((g 0)) (jobs (lambda () (set! g 1) (go-home))) g) 1 6]
-            [(let ((g '())) (jobs (lambda () (set! g (cons 1 g)) (switch-job 1))
-                                  (lambda () (set! g (cons 2 g)) (switch-job 2))
-                                  (lambda () (set! g (cons 3 g)) (switch-job 3))
-                                  (lambda () (set! g (cons 4 g)) (go-home))
+              
+              (jobs equal?
+                    [(let ((g 0)) (jobs (lambda () (set! g 1) (go-home))) g) 1 6]
+                    [(let ((g '())) (jobs (lambda () (set! g (cons 1 g)) (switch-job 1))
+                                          (lambda () (set! g (cons 2 g)) (switch-job 2))
+                                          (lambda () (set! g (cons 3 g)) (switch-job 3))
+                                          (lambda () (set! g (cons 4 g)) (go-home))
 
-               ) g) '(4 3 2 1) 6]
-            [(let ((g '())) (jobs (lambda () (set! g (cons 1 g)) (switch-job 2) (error "should not run"))
-                                  (lambda () (error "should not run"))
-                                  (lambda () (set! g (cons 3 g)) (switch-job 3) (error "should not run"))
-                                  (lambda () (set! g (cons 4 g)) (go-home) (error "should not run"))
+                                          ) g) '(4 3 2 1) 6]
+                    [(let ((g '())) (jobs (lambda () (set! g (cons 1 g)) (switch-job 2) (error "should not run"))
+                                          (lambda () (error "should not run"))
+                                          (lambda () (set! g (cons 3 g)) (switch-job 3) (error "should not run"))
+                                          (lambda () (set! g (cons 4 g)) (go-home) (error "should not run"))
 
-               ) g) '(4 3 1) 6]
+                                          ) g) '(4 3 1) 6]
             
-            [(let ((g '())) (jobs (lambda () (set! g (cons 1 g)) (switch-job 1) (set! g (cons 5 g)) (switch-job 1) (error "should not run"))
-                                  (lambda () (set! g (cons 1 g)) (switch-job 2) (set! g (cons 6 g)) (switch-job 2) (error "should not run"))
-                                  (lambda () (set! g (cons 3 g)) (switch-job 3) (set! g (cons 7 g)) (switch-job 3) (error "should not run"))
-                                  (lambda () (set! g (cons 4 g)) (switch-job 0) (set! g (cons 8 g)) (go-home) (error "should not run"))
+                    [(let ((g '())) (jobs (lambda () (set! g (cons 1 g)) (switch-job 1) (set! g (cons 5 g)) (switch-job 1) (error "should not run"))
+                                          (lambda () (set! g (cons 1 g)) (switch-job 2) (set! g (cons 6 g)) (switch-job 2) (error "should not run"))
+                                          (lambda () (set! g (cons 3 g)) (switch-job 3) (set! g (cons 7 g)) (switch-job 3) (error "should not run"))
+                                          (lambda () (set! g (cons 4 g)) (switch-job 0) (set! g (cons 8 g)) (go-home) (error "should not run"))
 
-                                  ) g) '(8 7 6 5 4 3 1 1) 6]
-            [(let ((g '())) (jobs (lambda () (set! g (cons 1 g)) (switch-job 1) (set! g (cons 5 g)) (set! g (cons 3 g)) (switch-job 1) (set! g (cons 7 g)) (switch-job 1) (switch-job 1) (error "should not run"))
-                                  (lambda () (set! g (cons 10 g)) (switch-job 0) (set! g (cons 6 g)) (switch-job 0)  (set! g (cons 4 g)) (switch-job 0) (set! g (cons 8 g)) (go-home) (error "should not run")(error "should not run"))
-                                  ) g) '(8 4 7 6 3 5 10 1) 6]
+                                          ) g) '(8 7 6 5 4 3 1 1) 6]
+                    [(let ((g '())) (jobs (lambda () (set! g (cons 1 g)) (switch-job 1) (set! g (cons 5 g)) (set! g (cons 3 g)) (switch-job 1) (set! g (cons 7 g)) (switch-job 1) (switch-job 1) (error "should not run"))
+                                          (lambda () (set! g (cons 10 g)) (switch-job 0) (set! g (cons 6 g)) (switch-job 0)  (set! g (cons 4 g)) (switch-job 0) (set! g (cons 8 g)) (go-home) (error "should not run")(error "should not run"))
+                                          ) g) '(8 4 7 6 3 5 10 1) 6]
             
-            [(let ((g '())) (jobs (lambda () (set! g (cons 1 g)) (switch-job 1) (go-home) (set! g (cons 3 g)) (switch-job 1) (set! g (cons 7 g)) (switch-job 1) (switch-job 1) (error "should not run"))
-                                  (lambda () (set! g (cons 10 g)) (switch-job 0) (set! g (cons 6 g)) (switch-job 0)  (set! g (cons 4 g)) (switch-job 0) (set! g (cons 8 g)) (go-home) (error "should not run")(error "should not run"))
-                                  ) g) '(10 1) 6])
+                    [(let ((g '())) (jobs (lambda () (set! g (cons 1 g)) (switch-job 1) (go-home) (set! g (cons 3 g)) (switch-job 1) (set! g (cons 7 g)) (switch-job 1) (switch-job 1) (error "should not run"))
+                                          (lambda () (set! g (cons 10 g)) (switch-job 0) (set! g (cons 6 g)) (switch-job 0)  (set! g (cons 4 g)) (switch-job 0) (set! g (cons 8 g)) (go-home) (error "should not run")(error "should not run"))
+                                          ) g) '(10 1) 6])
 
-  ))
+              ))
 
 (implicit-run test) ; run tests as soon as this file is loaded
