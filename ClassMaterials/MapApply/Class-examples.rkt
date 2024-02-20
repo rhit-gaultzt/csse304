@@ -1,18 +1,31 @@
 #lang racket
 
+
+(define one-even?
+  (lambda (lon)
+    (= 1 (let recur ([lon lon])
+           (cond [(null? lon) 0]
+                 [(even? (car lon))
+                  (add1 (recur (cdr lon)))]
+                 [else
+                  (recur (cdr lon))])))))
+                        
+  
 ; firsts 
 
 (define firsts
   (lambda (lol)
-    '() ;; NYI
-))
+    (if (null? lol)
+        '()
+        (cons  (first (car lol)) (firsts (cdr lol))))))
 
 ; Map unary
 
 (define map-unary
-  (lambda (func list)
-    '() ;; NYI
-  ))
+  (lambda (func lst)
+    (if (null? lst)
+        '()
+        (cons (func (car lst)) (map-unary func (cdr lst))))))
 
 ;; use map-unary to simplify firsts
 
@@ -29,17 +42,19 @@
 ;; note these are lists, not scheme "pairs"
 (define sum-pairs
   (lambda (pairlist)
-    '() ;; NYI
-  ))
+    (map (lambda (pair)
+           (+ (first pair) (second pair)))
+         pairlist)))
 
 (sum-pairs '((1 2) (3 4))) ;; should yield (3 7)
 
 ;; take a list of numbers, and halve all the even ones
 ;; note that in scheme the % operator is called modulo
 (define halve-evens
-  (lambda (pairlist)
-    '() ;; NYI
-  ))
+  (lambda (lst)
+    (map (lambda (num)
+           (if (even? num) (/ num 2) num))
+         lst)))
 
 (halve-evens '(1 2 3 40 60)) ;; should yield (1 1 3 20 30)
 
@@ -50,9 +65,10 @@
 ;; takes a list of numbers, and removes all members that are evenly 
 ;; divisible by a given value
 (define remove-divisible-by 
-  (lambda (num list)
-    '() ;; NYI
-  ))
+  (lambda (num lst)
+    (filter (lambda (el)
+              (not (zero? (modulo el num))))
+            lst)))
 
 (remove-divisible-by 3 '(1 2 3 4 5 6)) ;; should yield (1 2 4 5)
 
@@ -101,7 +117,9 @@
 
 (define make-list-cleaner
   (lambda (value-to-clean)
-    'nyi))
+    (lambda (arg-list)
+      (filter (lambda (val) (not (equal? value-to-clean val))) arg-list))))
+      
 
 (define remove-zeros (make-list-cleaner 0))
 (define remove-qs (make-list-cleaner 'q))
@@ -123,7 +141,10 @@
 
 (define make-limited
   (lambda (proc)
-    'nyi))
+    (lambda params
+      (if (< (length params) 4)
+          (apply proc params)
+          'unreasonable))))
       
 
 

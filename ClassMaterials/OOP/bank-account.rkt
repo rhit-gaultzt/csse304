@@ -2,7 +2,15 @@
 
 (define make-bank-account
   (lambda (starting-balance)
-    'nyi)) 
+    (let ([bal starting-balance])
+      (lambda (command . extra-args)
+        (cond [(equal? command 'deposit)
+               (set! bal (+ bal (first extra-args)))]
+              [(equal? command 'withdraw)
+               (set! bal (- bal (first extra-args)))]
+              [(equal? command 'balance)
+               bal]
+              [else 'unknown-command])))))
 
 ; hint, you might find the lambda form with required
 ; and optional args useful here

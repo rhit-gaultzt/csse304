@@ -56,6 +56,8 @@
 
 (define-syntax if-it
   (lambda (stx)
+    (syntax-case stx ()
+      [(if-it test-exp
     #'(quote nyi)))
 
 (if-it 3 it 4) ; returns 3

@@ -1,10 +1,12 @@
+#lang racket
+
 (define occurs-bound?
-  (lambda (var exp)
+  (lambda (var lc-exp)
     (cond
-      ((symbol? exp) #f)
-      ((eqv? (car exp) 'lambda)
-       (or (occurs-bound? var (caddr exp))
-            (and (eqv? (caadr exp) var)
-                   (occurs-free? var (caddr exp)))))
-      (else (or (occurs-bound? var  (car exp))
-                   (occurs-bound? var (cadr exp)))))))
+      ((symbol? lc-exp) #f)
+      ((eqv? (first lc-exp) 'lambda)
+       (or (occurs-bound? var (third lc-exp))
+           (and (eqv? (caadr lc-exp) var)
+                (occur-free? var (second lc-exp)))))
+      (else (or (occurs-bound? var (first lc-exp))
+                (occurs-bound? var (second lc-exp)))))))
