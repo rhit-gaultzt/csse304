@@ -25,7 +25,6 @@
     (if (null? lst)
         (apply-k k '())
         (flatten-cps (cdr lst) (step1 lst k)))))
-    
 
 (define apply-k
   (lambda (k v)

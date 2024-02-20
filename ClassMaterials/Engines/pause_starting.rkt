@@ -1,18 +1,28 @@
 #lang racket
 
+(define pause-k #f)
+(define resume-k #f)
+(define final-k #f)
+
 (define run-pausable
   (lambda (proc)
-
-    ; just running the proc is not enough of course
-    (proc)))
+    (call/cc (lambda (k)
+               (set! pause-k k)
+               (proc)
+               (when final-k (final-k))))))
 
 (define resume
   (lambda ()
-    'nyi))
+    (call/cc (lambda (k)
+               (set! final-k k)
+               (resume-k)))))
 
 (define pause
   (lambda ()
-    'nyi))
+    (call/cc (lambda (k)
+               (set! resume-k k)
+               (pause-k)))))
+    
 
 (run-pausable (lambda ()
                 (display 1)

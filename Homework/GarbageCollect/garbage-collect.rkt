@@ -1,3 +1,13 @@
+;;;
+;;; garbage-collect.rkt
+;;;
+;;; by Zachary Gault
+;;;
+;;; Starter Code Provided by Rose-Hulman CSSE304
+;;;
+;;; This file contains my solutions to the Rose-Hulman CSSE304 Programming Language
+;;; Concepts Garbage Collection Assignment.
+
 #lang racket
 
 (require rackunit)
@@ -327,17 +337,67 @@
 ;(: all-reachable (-> (Listof ptr) (Listof ptr)))
 (define all-reachable
   (lambda (base-ptrs)
-    (nyi)))
+    (all-reachable-helper base-ptrs '())))
+
+(define all-reachable-helper
+  (lambda (reachable visited)
+    (let ((unvisited (subtract reachable visited)))
+      (if (null? unvisited)
+          reachable
+          (all-reachable-helper (union reachable
+                                       (filter (lambda (x)
+                                                 (not (null-ptr? x)))
+                                               (ptr-pointers (first unvisited))))
+                                (cons (first unvisited) visited))))))
+
+(define subtract
+  (lambda (l1 l2)
+    (if (null? l1)
+        '()
+        (if (member (car l1) l2)
+            (subtract (cdr l1) l2)
+            (cons (car l1) (subtract (cdr l1) l2))))))
+
+(define union
+  (lambda (l1 l2)
+    (if (null? l1)
+        l2
+        (if (member (car l1) l2)
+            (union (cdr l1) l2)
+            (cons (car l1) (union (cdr l1) l2))))))
 
                        
          
-;; MAKE NYI
 ;(: garbage-collect (-> (Listof ptr) (Listof ptr)))
 (define garbage-collect
   (lambda (basis-set)
-    (nyi)))
-      
-                                
+    (set! next-index 0)
+    (let* ((no-null-basis-set (filter (lambda (x)
+                                        (not (null-ptr? x)))
+                                      basis-set))
+           (ptrs (sort (all-reachable no-null-basis-set)
+                       (lambda (ptr1 ptr2)
+                         (< (ptr-index ptr1) (ptr-index ptr2)))))
+           (mymap (make-hash (map (lambda (x)
+                                    (let ((start next-index))
+                                      (set! next-index (+ next-index (ptr-length x)))
+                                      (list start next-index)
+                                      (list (ptr-index x) start)))
+                                  ptrs))))
+      (hash-set! mymap -1 (list -1))
+      (set! next-index 0)
+      (map (lambda (x)
+             (write-array!
+              (append (list (vector-ref memory (ptr-index x)))
+                      (map (lambda (x)
+                             (car (hash-ref mymap (ptr-index x))))
+                           (ptr-pointers x))
+                      (ptr-values x))
+              next-index))
+           ptrs)
+      (map (lambda (x)
+             (ptr (car (hash-ref mymap (ptr-index x)))))
+           basis-set))))
       
    
       

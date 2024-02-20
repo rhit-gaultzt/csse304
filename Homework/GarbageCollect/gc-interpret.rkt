@@ -1,3 +1,13 @@
+;;;
+;;; gc-interpret.rkt
+;;;
+;;; by Zachary Gault
+;;;
+;;; Starter Code Provided by Rose-Hulman CSSE304
+;;;
+;;; This file contains my solutions to the Rose-Hulman CSSE304 Programming Language
+;;; Concepts Garbage Collection Assignment.
+
 #lang racket
 
 (require "garbage-collect.rkt")
@@ -261,7 +271,7 @@
 ; (: gc-before-continue (-> OutputValues (List 'paused ptr ptr ptr)))
 (define gc-before-continue
   (lambda (pause)
-    (nyi)))
+    (cons 'paused (garbage-collect (cdr pause)))))
 
 
 

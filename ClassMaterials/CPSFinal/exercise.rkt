@@ -1,5 +1,6 @@
 #lang racket
 (require "chez-init.rkt")
+(require racket/trace)
 
 ;; Below I've provided my solution to combine-conseq.  Most of the work
 ;; is actually done in a helper function - combine-consec-helper.  Convert
@@ -39,36 +40,34 @@
   [step1 (first number?)
          (last number?)
          (k continuation?)]
-  ; more types here 
   )
 
 (define apply-k
   (lambda (k v)
 	(cases continuation k
           [init-k () v]
-          [step1 (first last k) ; v is comb consec helper on cdr
+          [step1 (first last k)
                  (apply-k k (cons (list first last) v))]
-          ; more code here
           )))
 
-(define (combine-consec lst k)
+(define (combine-consec lst)
   (if (null? lst)
-      (apply-k k '())
+      '()
       (combine-consec-helper-cps
        (car lst)
        (car lst)
        (cdr lst)
-       k)))
+       (init-k))))
 
 (define (combine-consec-helper-cps first last lst k)
   (cond [(null? lst) (apply-k k (list (list first last)))]
         [(= (add1 last) (car lst))
          (combine-consec-helper-cps first (add1 last) (cdr lst) k)]
-        [else (combine-consec-helper-cps (car lst)
-                                         (car lst)
-                                         (cdr lst)
-                                         (step1 first last k))]))
+        [else
+         (combine-consec-helper-cps (car lst) (car lst) (cdr lst) (step1 first last k))]))
+
+(trace combine-consec combine-consec-helper-cps apply-k combine-consec-orig combine-consec-helper-orig)
 
 
 (combine-consec-orig '(1 2 3 6 7 8 13))
-(combine-consec '(1 2 3 6 7 8 13) (init-k))
+(combine-consec '(1 2 3 6 7 8 13))

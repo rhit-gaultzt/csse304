@@ -3,10 +3,7 @@
 (require "chez-init.rkt")
 (require racket/trace)
 
-; this is a helper procedure that divides the list
-; into 2 unsorted lists depending on the pivot
-;
-; initially call it with less and eqOrMore as '()
+
 (define divide
   (lambda (pivot lst less eqOrMore)
     (if (null? lst)
@@ -15,7 +12,6 @@
             (divide pivot (cdr lst) (cons (car lst) less) eqOrMore)
             (divide pivot (cdr lst) less (cons (car lst) eqOrMore))))))
 
-; a classic qsort implementation
 (define qsort
   (lambda (lst)
     (if (null? lst) '()
@@ -29,14 +25,9 @@
 
 (define-datatype continuation continuation?
   [init-k]
-  [step1 (pivot number?)
-         (k continuation?)]
-  [step2 (split-lst list?)
-         (pivot number?)
-         (k continuation?)]
-  [step3 (sorted-less list?)
-         (pivot number?)
-         (k continuation?)]
+  [step1 (pivot number?) (k continuation?)]
+  [step2 (split-lst list?) (pivot number?) (k continuation?)]
+  [step3 (sorted-less list?) (pivot number?) (k continuation?)]
   )
 
 (define apply-k
@@ -48,10 +39,11 @@
                     (qsort-cps (car split-lst) (step2 split-lst pivot k)))]
       [step2 (split-lst pivot k)
              (let* ((sorted-less v))
-                    (qsort-cps (cdr split-lst) (step3 sorted-less pivot k)))]
+               (qsort-cps (cdr split-lst) (step3 sorted-less pivot k)))]
       [step3 (sorted-less pivot k)
              (let* ((sorted-more v))
                (apply-k k (append sorted-less (list pivot) sorted-more)))]
+
       )))
 
 (define divide-cps

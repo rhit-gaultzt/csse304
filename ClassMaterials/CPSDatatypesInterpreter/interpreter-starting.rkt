@@ -194,20 +194,47 @@
 (define top-level-eval
   (lambda (form)
     ; later we may add things that are not expressions.
-    (eval-exp (empty-env) form)))
+    (eval-exp (empty-env) form (init-k))))
+
+(define-datatype continuation continuation?
+  [init-k]
+  [if-step (env environment?)
+           (then-exp expression?)
+           (else-exp expression?)
+           (k continuation?)]
+  [map-step1 (proc procedure?)
+             (lst list?)
+             (k continuation?)]
+  [map-step2 (car-result scheme-value?)
+             (k continuation?)]
+  )
+
+(define apply-k
+  (lambda (k v)
+    (cases continuation k
+      [init-k () v]
+      [if-step (env then-exp else-exp k)
+               (if v
+                   (eval-exp env then-exp k)
+                   (eval-exp env else-exp k))]
+      [map-step1 (proc lst k)
+                (let ((car-result v))
+                  (map-cps proc (cdr lst) (map-step2 car-result k)))]
+      [map-step2 (car-result k)
+                 (apply-k k (cons car-result v))]
+               
+      )))
 
 ; eval-exp is the main component of the interpreter
 
 (define eval-exp
-  (lambda (env exp)
+  (lambda (env exp k)
     (cases expression exp
-      [lit-exp (datum) datum]
+      [lit-exp (datum) (apply-k k datum)]
       [if-exp (test-exp then-exp else-exp)
-              (if (eval-exp env test-exp)
-                  (eval-exp env then-exp)
-                  (eval-exp env else-exp))]
+              (eval-exp env test-exp (if-step env then-exp else-exp k))]
       [lambda-exp (vars bodies)
-                  (closure-proc vars bodies env)]
+                  (apply-k k (closure-proc vars bodies env))]
       [let-exp (vars var-exps bodies)
                (let* ((evaled-vars (eval-rands env var-exps))
                       (new-env (extend-env vars
@@ -215,7 +242,7 @@
                                            env)))
                  (last (eval-rands new-env bodies)))]
       [var-exp (id)
-               (apply-env env id)]
+               (apply-k k (apply-env env id))]
       [app-exp (rator rands)
                (let ([proc-value (eval-exp env rator)]
                      [args (eval-rands env rands)])
@@ -224,9 +251,18 @@
 
 ; evaluate the list of operands, putting results into a list
 
+(define map-cps
+  (lambda (proc lst k)
+    (if (null? lst)
+        (apply-k k '())
+        (proc (car lst) (map-step1 proc lst k)))))
+        
+
 (define eval-rands
   (lambda (env rands)
-    (map (lambda (exp) (eval-exp env exp)) rands)))
+    (map (lambda (exp)
+           (eval-exp env exp))
+         rands)))
 
 ;  Apply a procedure to its arguments.
 ;  At this point, we only have primitive procedures.  

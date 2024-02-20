@@ -13,9 +13,9 @@
 ; Each of these objects has references to other objects,
 ; represented as the stored list.
 ;
-; Q1 If we start with O5 as our root, what objects are reachable?
-; Q2 If we start with O2 as our root, what objects are reachable?
-; Q3 If we start with O2 and O5 as our roots, what objects are reachable?
+; Q1 If we start with O5 as our root, what objects are reachable? 4, 5
+; Q2 If we start with O2 as our root, what objects are reachable? 1, 2, 3
+; Q3 If we start with O2 and O5 as our roots, what objects are reachable? 1, 2, 3, 4, 5
 
 ; OK now lets implement reachable, which does this work for us.  To help you,
 ; I've included a set subtract and a set union operation.  My solution works
@@ -45,7 +45,11 @@
 ; particular helper
 (define reach-helper
   (lambda (reachable visited)
-    'nyi))
+    (let ((unvisited (subtract reachable visited)))
+      (if (null? unvisited)
+          reachable
+          (reach-helper (union reachable (vector-ref memory (car unvisited)))
+                        (cons (car unvisited) visited))))))
         
 (define reachable
   (lambda (roots)
